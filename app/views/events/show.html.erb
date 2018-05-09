@@ -1,0 +1,70 @@
+<div class="center jumbotron">
+  <h1>creator: <%= @creator.name %></h1>
+  <h3>
+    Place: <em><%= @event.place %></em>
+  </h3>
+  <p><%= @event.description %></p>
+  <small><%= Date.parse(@event.date.to_s).strftime('%a %d %b %Y') %></small><br>
+
+  <%= link_to "Retour", root_path, class: "btn btn-success" %>
+  <%if current_user.id == @event.creator_id%>
+    <%= link_to 'Editer', edit_event_path(@event), class: "btn btn-secondary" %>
+    <%= link_to 'Supprimer', @event, method: :delete, data: { confirm: 'Êtes-vous sure?' }, class: "btn btn-danger" %>
+  <% end %>
+  <%
+    i = 0
+    @attendees.each do |a|
+      if a.id == current_user.id
+        i += 1
+      end
+    end
+    if i > 0 
+    %>
+  <%= link_to "Je suis déjà participants", '#', class: "btn btn-outline-primary disabled" %>
+  <%else%>
+  <%= form_tag charges_path do %>
+    <article>
+      <% if flash[:error].present? %>
+        <div id="error_explanation">
+          <p><%= flash[:error] %></p>
+        </div>
+      <% end %>
+      <label class="amount">
+        <span>Prix de l'évènement: Ꞓ<%= @event.price %></span>
+      </label>
+      <%= hidden_field_tag 'event', @event.id  %>
+    </article>
+  
+    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+            data-description="Paiement pour cet evenement"
+            data-amount="<%= @event.price %>"
+            data-locale="auto"></script>
+  <% end %>
+  <%end%>
+</div>
+
+
+<div class="shadow mt-5 p-5 col-lg-10 offset-lg-1 bg-light">
+  <table class="table table-striped table-dark">
+    <thead>
+      <tr class="bg-primary">
+        <th scope="col">#</th>
+        <th scope="col">Invités</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <%=%>
+    
+      <% @attendees.each do |a| %>
+      <tr>
+        <th scope="row"><%= a.id%></th>
+        <td><%= a.name %></td>
+        <td><%= link_to "Voir", user_show_path(a.id), class: 'btn btn-info' %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

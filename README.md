@@ -1,1 +1,2 @@
 # eventbrite-devise
+# Team Madgascar
